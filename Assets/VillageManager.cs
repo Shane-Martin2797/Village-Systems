@@ -30,6 +30,8 @@ public class VillageManager : MonoBehaviour
 	public Vector2 sizeOfVillage = new Vector2(100, 100);
 	public Vector2 sectionSize = new Vector2(20, 20);
 
+	public float years = 0;
+
 	public int initialVillagerCount = 100;
 	public int adultAge = 16;
 
@@ -70,7 +72,19 @@ public class VillageManager : MonoBehaviour
 
 	public Villager GenerateVillager(Villager parentM = null, Villager parentF = null)
 	{
-		Villager vil = new Villager();
+		bool m = (Random.value > 0.5f);
+
+		Villager vil;
+
+		if (m)
+		{
+			vil = new VillagerM();
+		}
+		else
+		{
+			vil = new VillagerF();
+		}
+
 
 		if (parentM == null || parentF == null)
 		{
@@ -89,7 +103,7 @@ public class VillageManager : MonoBehaviour
 
 		if (sectionAssign != null)
 		{
-			vil.SetSection(sectionAssign);
+			vil.sectionAssigned = (sectionAssign);
 
 			sectionAssign.GetVillagers().Add(vil);
 		}
@@ -99,10 +113,77 @@ public class VillageManager : MonoBehaviour
 		return vil;
 	}
 
+	int updateTimes = 1;
+
 	void Update()
 	{
-		UpdateVillagers(Time.deltaTime);
+		if (Input.GetKeyUp(KeyCode.Alpha1))
+		{
+			updateTimes = 1;
+		}
+		else if (Input.GetKeyUp(KeyCode.Alpha2))
+		{
+			updateTimes = 2;
+		}
+		else if (Input.GetKeyUp(KeyCode.Alpha3))
+		{
+			updateTimes = 4;
+		}
+		else if (Input.GetKeyUp(KeyCode.Alpha4))
+		{
+			updateTimes = 8;
+		}
+		else if (Input.GetKeyUp(KeyCode.Alpha5))
+		{
+			updateTimes = 16;
+		}
+		else if (Input.GetKeyUp(KeyCode.Alpha6))
+		{
+			updateTimes = 32;
+		}
+		else if (Input.GetKeyUp(KeyCode.Alpha7))
+		{
+			updateTimes = 64;
+		}
+		else if (Input.GetKeyUp(KeyCode.Alpha8))
+		{
+			updateTimes = 100;
+		}
+
+
+		//Starts Lagging After ~500 Villagers
+		if (villagers.Count > 500)
+		{
+			if (!logged)
+			{
+				Debug.Log("Village Reached " + villagers.Count + " Villagers After: " + years.ToString() + " years");
+				logged = true;
+			}
+		}
+		else if (villagers.Count > 0)
+		{
+			for (int i = 0; i < updateTimes; i++)
+			{
+				if (villagers.Count > 500)
+				{
+					break;
+				}
+				years += Time.deltaTime;
+				UpdateVillagers(Time.deltaTime);
+			}
+		}
+		else
+		{
+			if (!logged)
+			{
+				Debug.Log("Village Died After: " + years.ToString() + " years");
+				logged = true;
+			}
+		}
 	}
+
+	bool logged = false;
+
 
 	private List<Villager> killList = new List<Villager>();
 
@@ -121,19 +202,6 @@ public class VillageManager : MonoBehaviour
 		for (int i = 0; i < villagers.Count; i++)
 		{
 			villagers [i].Update(villageTime);
-
-
-
-			//Do Adult Stuff
-			if (villagers [i].stats.age >= adultAge)
-			{
-				if (villagers [i].GetPartners().Count < villagers [i].stats.possiblePartnerCount)
-				{
-					Villager partner = villagers [i].GetSection().PickPartner(villagers [i]);
-
-					villagers [i].AddPartner(partner);
-				}
-			}
 		}
 
 		for (int i = 0; i < killList.Count; i++)

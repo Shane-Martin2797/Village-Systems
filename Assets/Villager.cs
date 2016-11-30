@@ -11,58 +11,36 @@ public class Villager
 		Female
 	}
 
+	public List<string> names = new List<string> { "Villager" };
+
 	public string name = "Villager";
 
-	private List<Villager> family;
+	public List<Villager> family { get; set; }
 
-	public List<Villager> GetFamily()
-	{
-		return family;
-	}
+	public List<Villager> partners { get; set; }
 
-	private List<Villager> partners;
+	public List<Villager> children { get; set; }
 
-	public List<Villager> GetPartners()
-	{
-		return partners;
-	}
-
-	private List<Villager> children;
-
-	public List<Villager> GetChildren()
-	{
-		return children;
-	}
-
-	private Section sectionAssigned;
-
-	public void SetSection(Section s)
-	{
-		sectionAssigned = s;
-	}
-
-	public Section GetSection()
-	{
-		return sectionAssigned;
-	}
+	public Section sectionAssigned { get; set; }
 
 
-	public Villager dad;
-	public Villager mum;
+	public Villager dad { get; set; }
+
+	public Villager mum { get; set; }
 
 	public Gender gender;
 
 	public Stats stats;
 
-	bool setup = false;
+	public bool setup = false;
 
-	public void Initialise()
+	public virtual void Initialise()
 	{
+		name = names [Random.Range(0, names.Count)];
+
 		family = new List<Villager>();
 		partners = new List<Villager>();
 		children = new List<Villager>();
-
-		gender = (Random.value > 0.5f) ? Gender.Male : Gender.Female;
 
 		stats = new Stats();
 		stats.Initialise();
@@ -70,38 +48,35 @@ public class Villager
 		setup = true;
 	}
 
-	public void Initialise(Villager _dad, Villager _mum)
+	public virtual void Initialise(Villager _dad, Villager _mum)
 	{
+		name = names [Random.Range(0, names.Count)];
+
 		dad = _dad;
 		mum = _mum;
-
-		gender = (Random.value > 0.5f) ? Gender.Male : Gender.Female;
 
 		family = new List<Villager>();
 		partners = new List<Villager>();
 		children = new List<Villager>();
 
+
 		AddFamily(dad);
 		AddFamily(mum);
 
-		for (int i = 0; i < dad.family.Count; i++)
-		{
-			AddFamily(dad.family [i]);
-		}
+		dad.AddChild(this);
+		mum.AddChild(this);
 
-		for (int i = 0; i < mum.family.Count; i++)
-		{
-			AddFamily(mum.family [i]);
-		}
+		AddFamily(dad.children);
+		AddFamily(mum.children);
 
 		stats = new Stats();
-		stats.Initialise(dad, mum, (gender == Gender.Male));
+		stats.Initialise(dad, mum, true);
 
 		setup = true;
 	}
 
 
-	public void AddFamily(Villager vil)
+	public virtual void AddFamily(Villager vil)
 	{
 		if (vil == this)
 		{
@@ -119,11 +94,20 @@ public class Villager
 		}
 	}
 
-	public void AddChild(Villager vil)
+	public virtual void AddChild(Villager vil)
 	{
 		if (vil == this)
 		{
 			return;
+		}
+
+		//For the other Children, Add this Child to thier family
+		for (int i = 0; i < children.Count; i++)
+		{
+			if (!children [i].family.Contains(vil))
+			{
+				children [i].AddFamily(vil);
+			}
 		}
 
 		if (!children.Contains(vil))
@@ -131,10 +115,14 @@ public class Villager
 			children.Add(vil);
 			AddFamily(vil);
 		}
+
+		if (!vil.family.Contains(this))
+		{
+			vil.AddFamily(this);
+		}
 	}
 
-
-	public void AddFamily(List<Villager> vilFam)
+	public virtual void AddFamily(List<Villager> vilFam)
 	{
 		for (int i = 0; i < vilFam.Count; i++)
 		{
@@ -142,8 +130,7 @@ public class Villager
 		}
 	}
 
-
-	public bool CanAddPartner(Villager vil)
+	public virtual bool CanAddPartner(Villager vil)
 	{
 		//Null Check
 		if (vil == null)
@@ -161,10 +148,6 @@ public class Villager
 		{
 			return false;
 		}
-
-		// Checks To Add (MAYBE):
-		// AGE CHECK
-		//
 
 		//Partner Count Check
 		if (partners.Count == stats.possiblePartnerCount || vil.partners.Count == vil.stats.possiblePartnerCount)
@@ -193,7 +176,7 @@ public class Villager
 		return true;
 	}
 
-	public bool AddPartner(Villager vil)
+	public virtual bool AddPartner(Villager vil)
 	{
 		if (CanAddPartner(vil))
 		{
@@ -211,14 +194,14 @@ public class Villager
 		}
 	}
 
-	public void Update(float villageTime)
+	public virtual void Update(float villageTime)
 	{
 		if (!setup)
 		{
 			return;
 		}
 
-		stats.age += (villageTime * 2);
+		stats.age += (villageTime);
 
 		if (stats.age > stats.lifeTime)
 		{
@@ -231,30 +214,9 @@ public class Villager
 				Kill();
 			}
 		}
-
-
-		if (gender == Gender.Male)
-		{
-			//Change the rule for when children can be had.
-			if (Mathf.RoundToInt(stats.age) % 5 == 0)
-			{
-				if (children.Count < stats.maxChildren)
-				{
-					for (int i = 0; i < partners.Count; i++)
-					{
-						if (Random.value > 0.5f)
-						{
-							Villager v = VillageManager.Instance.GenerateVillager(this, partners [i]);
-							AddChild(v);
-							partners [i].AddChild(v);
-						}
-					}
-				}
-			}
-		}
 	}
 
-	public void Kill()
+	public virtual void Kill()
 	{
 		if (VillageManager.Instance != null)
 		{

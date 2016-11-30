@@ -27,20 +27,10 @@ public class Stat
 [System.Serializable]
 public class Stats
 {
-	private Stat strength;
+	public Stat strength { get; set; }
 
-	public Stat GetStrength()
-	{
-		return strength;
-	}
+	public Stat vitality { get; set; }
 
-	private Stat vitality;
-
-
-	public Stat GetVitality()
-	{
-		return vitality;
-	}
 
 
 	public int lifeTime { get; private set; }
@@ -50,6 +40,9 @@ public class Stats
 	public float age = 0;
 
 	public int maxChildren = 2;
+
+	public int partnersCountDisplay = 0;
+	public int maxAgeDisplay = 0;
 
 	public void Initialise()
 	{
@@ -76,6 +69,11 @@ public class Stats
 	private void CalculateAllStatRefences()
 	{
 		possiblePartnerCount = Mathf.FloorToInt((1.4121f * Mathf.Log((float)strength.value)) - 1.2103f);
+		partnersCountDisplay = possiblePartnerCount;
+
+		maxChildren = Mathf.Max(2, Mathf.FloorToInt((1.4121f * Mathf.Log((float)strength.value)) - 1.2103f));
+
 		lifeTime = Mathf.RoundToInt((20 * ((float)vitality.value - 5)) + 50);
+		maxAgeDisplay = lifeTime;
 	}
 }
