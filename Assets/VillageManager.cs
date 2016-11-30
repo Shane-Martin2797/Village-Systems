@@ -117,6 +117,11 @@ public class VillageManager : MonoBehaviour
 
 	void Update()
 	{
+		if (logged)
+		{
+			return;
+		}
+
 		if (Input.GetKeyUp(KeyCode.Alpha1))
 		{
 			updateTimes = 1;
