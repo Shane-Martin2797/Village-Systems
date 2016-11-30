@@ -114,6 +114,8 @@ public class VillageManager : MonoBehaviour
 	}
 
 	int updateTimes = 1;
+	int maxVillagers = 0;
+
 
 	void Update()
 	{
@@ -162,6 +164,7 @@ public class VillageManager : MonoBehaviour
 			if (!logged)
 			{
 				Debug.Log("Village Reached " + villagers.Count + " Villagers After: " + years.ToString() + " years");
+				Debug.Log("Max Villagers = " + maxVillagers.ToString());
 				logged = true;
 			}
 		}
@@ -176,12 +179,18 @@ public class VillageManager : MonoBehaviour
 				years += Time.deltaTime;
 				UpdateVillagers(Time.deltaTime);
 			}
+
+			if (villagers.Count > maxVillagers)
+			{
+				maxVillagers = villagers.Count;
+			}
 		}
 		else
 		{
 			if (!logged)
 			{
 				Debug.Log("Village Died After: " + years.ToString() + " years");
+				Debug.Log("Max Villagers = " + maxVillagers.ToString());
 				logged = true;
 			}
 		}
