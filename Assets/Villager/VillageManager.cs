@@ -30,6 +30,10 @@ public class VillageManager : MonoBehaviour
 	public Vector2 sizeOfVillage = new Vector2(100, 100);
 	public Vector2 sectionSize = new Vector2(20, 20);
 
+	public int timeMultiplier = 1;
+	public System.DateTime startingDate = System.DateTime.Now;
+	public int villagerGrowthAccelerator = 1;
+
 	public float years = 0;
 
 	public int initialVillagerCount = 100;
@@ -40,6 +44,8 @@ public class VillageManager : MonoBehaviour
 
 	void Start()
 	{
+		startingDate = System.DateTime.Now;
+
 		SetSections();
 
 		for (int i = 0; i < initialVillagerCount; i++)
@@ -72,7 +78,7 @@ public class VillageManager : MonoBehaviour
 
 	public Villager GenerateVillager(Villager parentM = null, Villager parentF = null)
 	{
-		bool m = (Random.value > 0.5f);
+		bool m = ((Random.value * villagerGrowthAccelerator) > 0.5f);
 
 		Villager vil;
 
@@ -170,6 +176,8 @@ public class VillageManager : MonoBehaviour
 		}
 		else if (villagers.Count > 0)
 		{
+			updateTimes = (updateTimes * timeMultiplier);
+
 			for (int i = 0; i < updateTimes; i++)
 			{
 				if (villagers.Count > 500)

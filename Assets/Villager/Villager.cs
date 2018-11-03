@@ -15,38 +15,28 @@ public class Villager
 
 	public string name = "Villager";
 
+	public Section sectionAssigned { get; set; }
+
+	public Stats stats;
+
+	public bool setup = false;
+
+
+	//Villager Family
+
+	#region VillagerStatusControls
+
 	public List<Villager> family { get; set; }
 
 	public List<Villager> partners { get; set; }
 
 	public List<Villager> children { get; set; }
 
-	public Section sectionAssigned { get; set; }
-
-
 	public Villager dad { get; set; }
 
 	public Villager mum { get; set; }
 
 	public Gender gender;
-
-	public Stats stats;
-
-	public bool setup = false;
-
-	public virtual void Initialise()
-	{
-		name = names [Random.Range(0, names.Count)];
-
-		family = new List<Villager>();
-		partners = new List<Villager>();
-		children = new List<Villager>();
-
-		stats = new Stats();
-		stats.Initialise();
-
-		setup = true;
-	}
 
 	public virtual void Initialise(Villager _dad, Villager _mum)
 	{
@@ -193,6 +183,27 @@ public class Villager
 			return false;
 		}
 	}
+
+	#endregion
+
+
+
+
+
+	public virtual void Initialise()
+	{
+		name = names [Random.Range(0, names.Count)];
+
+		family = new List<Villager>();
+		partners = new List<Villager>();
+		children = new List<Villager>();
+
+		stats = new Stats();
+		stats.Initialise();
+
+		setup = true;
+	}
+
 
 	public virtual void Update(float villageTime)
 	{
