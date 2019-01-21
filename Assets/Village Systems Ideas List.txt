@@ -1,0 +1,32 @@
+Village Systems:
+
+
+Public Class JobAction
+	Resource requiredResource
+
+Public virtual/abstract Class Job
+	Jobname
+	JobAction
+
+Public Class Resource
+	bool Infinite
+	Job jobRequirement
+	JobAction actionRequirement
+	obj resource
+	int/float amountGiven
+
+UpdateTime (10min intervals)
+FastForwardTime (x2, x4, x8)
+SkipTime (1 day, 1 week, 1 year)
+
+bool expandVillage (build more housing as required, find resources, etc)
+bool infiniteHousing (pre-placed houses hold all villagers)
+bool randomlySpawnVillages
+bool villagesInteract
+Vector3 startVillageGrid (for spawning)
+Vector3 endVillageGrid (as above)
+
+
+Village Territory?
+
+VillagersHaveHealth

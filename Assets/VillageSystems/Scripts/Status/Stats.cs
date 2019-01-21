@@ -31,8 +31,6 @@ public class Stats
 
 	public Stat vitality { get; set; }
 
-
-
 	public int lifeTime { get; private set; }
 
 	public int possiblePartnerCount { get; private set; }

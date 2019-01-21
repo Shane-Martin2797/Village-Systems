@@ -2,30 +2,8 @@
 using System.Collections;
 using System.Collections.Generic;
 
-public class VillageManager : MonoBehaviour
+public class VillageManager : SingletonBehaviour<VillageManager>
 {
-
-	public static VillageManager Instance { get; private set; }
-
-	void Awake()
-	{
-		if (Instance == null)
-		{
-			Instance = this;
-		}
-		else
-		{
-			Destroy(this.gameObject);
-		}
-	}
-
-	void OnDestroy()
-	{
-		if (Instance == this)
-		{
-			Instance = null;
-		}
-	}
 
 	public Vector2 sizeOfVillage = new Vector2(100, 100);
 	public Vector2 sectionSize = new Vector2(20, 20);
