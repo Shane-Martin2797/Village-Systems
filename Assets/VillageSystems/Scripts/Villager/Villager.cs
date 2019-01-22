@@ -91,7 +91,7 @@ public class Villager
 			return;
 		}
 
-		//For the other Children, Add this Child to thier family
+		//For the other Children, Add this Child to their family
 		for (int i = 0; i < children.Count; i++)
 		{
 			if (!children [i].family.Contains(vil))
@@ -158,7 +158,7 @@ public class Villager
 		}
 
 		//Age Check (20 years difference is maximum)
-		if (Mathf.Abs(vil.stats.age - stats.age) > 20)
+		if (Mathf.Abs(vil.stats.age - stats.age) > VillageManager.Instance.maxAgeGap)
 		{
 			return false;
 		}
@@ -229,16 +229,7 @@ public class Villager
 
 	public virtual void Kill()
 	{
-		if (VillageManager.Instance != null)
-		{
-			VillageManager.Instance.villagers.Remove(this);
-		}
-
-		if (sectionAssigned != null)
-		{
-			sectionAssigned.GetVillagers().Remove(this);
-		}
-
+		//Remove themselves from their children's family lists
 		if (children.Count > 0)
 		{
 			for (int i = 0; i < children.Count; i++)
@@ -251,6 +242,7 @@ public class Villager
 			}
 		}
 
+		//Remove themselves from their family lists
 		if (family.Count > 0)
 		{
 			for (int i = 0; i < family.Count; i++)
@@ -263,6 +255,7 @@ public class Villager
 			}
 		}
 
+		//Remove themselves from their partners lists
 		if (partners.Count > 0)
 		{
 			for (int i = 0; i < partners.Count; i++)
@@ -274,5 +267,26 @@ public class Villager
 				partners [i].family.Remove(this);
 			}
 		}
+
+		//Remove themselves from their section
+		if (sectionAssigned != null)
+		{
+			sectionAssigned.GetVillagers().Remove(this);
+		}
+
+		//Remove themselves from the Villagers List
+		if (VillageManager.Instance != null)
+		{
+			VillageManager.Instance.villagers.Remove(this);
+		}
+	}
+
+	public virtual bool CanHaveChildren()
+	{
+		if (!(children.Count < stats.maxChildren))
+		{
+			return false;
+		}
+		return true;
 	}
 }

@@ -16,8 +16,12 @@ public class VillageManager : SingletonBehaviour<VillageManager>
 
 	public int initialVillagerCount = 100;
 	public int adultAge = 16;
+	public int maxAgeGap = 20;
 
 	public List<Villager> villagers = new List<Villager>();
+	private List<VillagerF> fVillagers = new List<VillagerF>();
+	private List<VillagerM> mVillagers = new List<VillagerM>();
+
 	public Section[,] sections;
 
 	void Start()
@@ -54,19 +58,25 @@ public class VillageManager : SingletonBehaviour<VillageManager>
 		}
 	}
 
-	public Villager GenerateVillager(Villager parentM = null, Villager parentF = null)
+	public Villager GenerateVillager(VillagerM parentM = null, VillagerF parentF = null)
 	{
-		bool m = ((Random.value * villagerGrowthAccelerator) > 0.5f);
+		bool m = ((Random.value) > 0.5f);
 
 		Villager vil;
 
 		if (m)
 		{
-			vil = new VillagerM();
+			VillagerM vilm;
+			vilm = new VillagerM();
+			vil = vilm;
+			mVillagers.Add(vilm);
 		}
 		else
 		{
-			vil = new VillagerF();
+			VillagerF vilf;
+			vilf = new VillagerF();
+			vil = vilf;
+			fVillagers.Add(vilf);
 		}
 
 
@@ -77,6 +87,8 @@ public class VillageManager : SingletonBehaviour<VillageManager>
 		else
 		{
 			vil.Initialise(parentM, parentF);
+			parentF.pregnant = false;
+			parentF.timeSincePregnant = 0;
 		}
 
 		int x = Random.Range(0, sections.GetLength(0));
@@ -154,16 +166,18 @@ public class VillageManager : SingletonBehaviour<VillageManager>
 		}
 		else if (villagers.Count > 0)
 		{
-			updateTimes = (updateTimes * timeMultiplier);
+			updateTimes = (updateTimes);
 
-			for (int i = 0; i < updateTimes; i++)
+			for (int i = 0; i < (updateTimes * timeMultiplier); i++)
 			{
 				if (villagers.Count > 500)
 				{
 					break;
 				}
-				years += Time.deltaTime;
+
+				years += (Time.deltaTime);
 				UpdateVillagers(Time.deltaTime);
+
 			}
 
 			if (villagers.Count > maxVillagers)
@@ -195,6 +209,7 @@ public class VillageManager : SingletonBehaviour<VillageManager>
 		}
 	}
 
+
 	public void UpdateVillagers(float villageTime)
 	{
 
@@ -204,9 +219,83 @@ public class VillageManager : SingletonBehaviour<VillageManager>
 			villagers [i].Update(villageTime);
 		}
 
+		for (int i = 0; i < mVillagers.Count; i++)
+		{
+			BreedVillager(mVillagers [i]);
+		}
+
+		CheckPregnancy();
+
 		for (int i = 0; i < killList.Count; i++)
 		{
 			killList [i].Kill();
 		}
 	}
+
+
+	//Males Pick Female Partners *Tradition Gender Roles eekkkk* TODO
+	void BreedVillager(VillagerM vil)
+	{
+		if (vil.stats.age >= VillageManager.Instance.adultAge)
+		{
+			if (vil.partners.Count < vil.stats.possiblePartnerCount)
+			{
+				VillagerF partner = PickPartner(vil);
+				vil.AddPartner(partner);
+			}
+		}
+
+		if (vil.partnersF == null)
+		{
+			return;
+		}
+
+		for (int i = 0; i < vil.partnersF.Count; i++)
+		{
+			if (vil.partnersF [i] == null)
+			{
+				continue;
+			}
+			if (vil.partnersF [i].CanHaveChildren())
+			{
+				if ((Random.value * villagerGrowthAccelerator) >= 0.5f)
+				{
+					vil.partnersF [i].pregnant = true;
+					vil.partnersF [i].timeSincePregnant = 0;
+				}
+			}
+		}
+	}
+
+	private void CheckPregnancy()
+	{
+		for (int i = 0; i < fVillagers.Count; i++)
+		{
+			if (fVillagers [i].pregnant)
+			{
+				if (fVillagers [i].timeSincePregnant >= fVillagers [i].timePregnancyLasts)
+				{
+					Villager v = VillageManager.Instance.GenerateVillager(fVillagers [i].partnersM [0], fVillagers [i]);
+					fVillagers [i].AddChild(v);
+					fVillagers [i].partnersM [0].AddChild(v);
+				}
+			}
+
+		}
+	}
+
+	private VillagerF PickPartner(VillagerM vil)
+	{
+		for (int j = 0; j < fVillagers.Count; j++)
+		{
+			if (vil.CanAddPartner(fVillagers [j]))
+			{
+				return fVillagers [j];
+			}
+		}
+
+		return null;
+	}
+
 }
+

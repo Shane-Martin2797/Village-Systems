@@ -33,7 +33,7 @@ public class Stats
 
 	public int lifeTime { get; private set; }
 
-	public int possiblePartnerCount { get; private set; }
+	public int possiblePartnerCount { get; set; }
 
 	public float age = 0;
 

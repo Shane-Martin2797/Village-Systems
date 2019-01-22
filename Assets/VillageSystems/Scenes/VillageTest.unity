@@ -120,10 +120,11 @@ MonoBehaviour:
   sizeOfVillage: {x: 100, y: 100}
   sectionSize: {x: 100, y: 100}
   timeMultiplier: 1
-  villagerGrowthAccelerator: 1
+  villagerGrowthAccelerator: 4
   years: 0
   initialVillagerCount: 20
   adultAge: 16
+  maxAgeGap: 20
   villagers: []
 --- !u!4 &6663692
 Transform:
