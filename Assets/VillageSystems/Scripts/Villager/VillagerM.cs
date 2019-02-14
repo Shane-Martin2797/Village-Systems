@@ -5,9 +5,15 @@ using System.Collections.Generic;
 [System.Serializable]
 public class VillagerM : Villager
 {
+	public enum GoalsM
+	{
+		//Male only goals
+
+	}
+
 	public List<VillagerF> partnersF;
 
-	public List<string> names = new List<string>
+	public List<string> namesM = new List<string>
 	{
 		{ "Daniel" },
 		{ "Patrick" },
@@ -20,7 +26,7 @@ public class VillagerM : Villager
 		gender = Gender.Male;
 		base.Initialise();
 		partnersF = new List<VillagerF>();
-		name = names [Random.Range(0, names.Count)];
+		villagerName = namesM [Random.Range(0, namesM.Count)];
 	}
 
 	public override void Initialise(Villager _dad, Villager _mum)
@@ -28,12 +34,12 @@ public class VillagerM : Villager
 		gender = Gender.Male;
 		base.Initialise(_dad, _mum);
 		partnersF = new List<VillagerF>();
-		name = names [Random.Range(0, names.Count)];
+		villagerName = namesM [Random.Range(0, namesM.Count)];
 	}
 
-	public override void Update(float villageTime)
+	public override void UpdateVillager(float villageTime)
 	{
-		base.Update(villageTime);
+		base.UpdateVillager(villageTime);
 
 //		if (stats.age >= VillageManager.Instance.adultAge)
 //		{
@@ -102,7 +108,7 @@ public class VillagerM : Villager
 		}
 
 		//Age Check (20 years difference is maximum)
-		if (Mathf.Abs(vil.stats.age - stats.age) > VillageManager.Instance.maxAgeGap)
+		if (Mathf.Abs(vil.stats.age - stats.age) > currentVillage.maxAgeGap)
 		{
 			return false;
 		}
@@ -110,7 +116,7 @@ public class VillagerM : Villager
 		return true;
 	}
 
-	public bool CanHaveChildren()
+	public override bool CanHaveChildren()
 	{
 		if (!base.CanHaveChildren())
 		{

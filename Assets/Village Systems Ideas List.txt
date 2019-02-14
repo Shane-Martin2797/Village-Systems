@@ -1,4 +1,41 @@
+Game:
+Enemy Level's Don't Show until Engaged.
+Lv1 Orc > Lv10 Goblin
+Items can have max drop times (Unique = 1/common = inf)
+Drop Rates is > after more defeats of a boss/enemy
+Titles
+- Defeat "enemyType" 100 times/1000 times/10000 times.
+
+
 Village Systems:
+
+[y] Villagers Need to Become Objects Now
+[y] VillageManager needs to become a manager for a single village (not a singleton)
+[y] VillagesManager => is a singleton that manages all VillageManagers
+
+[Created Enum/No Implementation]
+Add Long Term Goals to Villagers
+>Become Village Head
+>Serve Village Head
+>Have a family
+>Become Stronger
+>Become a Guard
+>etc.
+
+[n]
+Add Long Term Personalities which can be affected by interaction with other Personalities over time.
+
+[Added Dictionary/No Implementation]
+Add Relationships other than partners/children.. Friends, etc.
+Make the Village Characters 3D.
+
+(List of all interacted people with affinity)
+Affinity is affected via action/personality/etc.
+
+[n]
+All Jobs/Resources/Everything Save to CSV
+> Add inspector to import/save to csv for villagers
+>> (implement later for now just read CSV)
 
 
 Public Class JobAction
@@ -30,3 +67,5 @@ Vector3 endVillageGrid (as above)
 Village Territory?
 
 VillagersHaveHealth
+
+[y] Avoid Spawning Near Other Villages 

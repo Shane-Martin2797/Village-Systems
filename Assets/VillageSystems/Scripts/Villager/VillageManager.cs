@@ -2,14 +2,16 @@
 using System.Collections;
 using System.Collections.Generic;
 
-public class VillageManager : SingletonBehaviour<VillageManager>
+public class VillageManager : MonoBehaviour
 {
+	// (pre-placed houses hold all villagers)
+	public bool infiniteHousing = false;
 
 	public Vector2 sizeOfVillage = new Vector2(100, 100);
 	public Vector2 sectionSize = new Vector2(20, 20);
 
-	public int timeMultiplier = 1;
-	public System.DateTime startingDate = System.DateTime.Now;
+	public Vector2 villagePos = new Vector2();
+
 	public int villagerGrowthAccelerator = 1;
 
 	public float years = 0;
@@ -24,15 +26,43 @@ public class VillageManager : SingletonBehaviour<VillageManager>
 
 	public Section[,] sections;
 
+	private Color col;
+
+	public bool villageRequiresUpdating
+	{
+		get
+		{
+			return villagers.Count > 0 && villagers.Count <= 500;
+		}
+	}
+
 	void Start()
 	{
-		startingDate = System.DateTime.Now;
-
 		SetSections();
 
 		for (int i = 0; i < initialVillagerCount; i++)
 		{
 			GenerateVillager();
+		}
+
+		VillageWorldManager.Instance.villages.Add(this);
+		VillageWorldManager.Instance.EditVillageGrid(this);
+		villagePos = new Vector2(transform.position.x, transform.position.z);
+
+
+		col = new Color(Random.value, Random.value, Random.value, 1);
+	}
+
+	public void OnDrawGizmos()
+	{
+		Gizmos.color = col;
+		if (villagers != null)
+		{
+			Gizmos.DrawCube(transform.position, ((new Vector3(sizeOfVillage.x, (villagers.Count / 2), sizeOfVillage.y)) / 2));
+		}
+		else
+		{
+			Gizmos.DrawCube(transform.position, ((new Vector3(sizeOfVillage.x, 50, sizeOfVillage.y)) / 2));
 		}
 	}
 
@@ -62,19 +92,23 @@ public class VillageManager : SingletonBehaviour<VillageManager>
 	{
 		bool m = ((Random.value) > 0.5f);
 
+		GameObject villagerObject;
+
+		villagerObject = new GameObject();
+
+		villagerObject.transform.SetParent(this.transform);
+
 		Villager vil;
 
 		if (m)
 		{
-			VillagerM vilm;
-			vilm = new VillagerM();
+			VillagerM vilm = villagerObject.AddComponent<VillagerM>();
 			vil = vilm;
 			mVillagers.Add(vilm);
 		}
 		else
 		{
-			VillagerF vilf;
-			vilf = new VillagerF();
+			VillagerF vilf = villagerObject.AddComponent<VillagerF>();
 			vil = vilf;
 			fVillagers.Add(vilf);
 		}
@@ -91,6 +125,9 @@ public class VillageManager : SingletonBehaviour<VillageManager>
 			parentF.timeSincePregnant = 0;
 		}
 
+		vil.homeVillage = this;
+		vil.currentVillage = this;
+
 		int x = Random.Range(0, sections.GetLength(0));
 		int y = Random.Range(0, sections.GetLength(1));
 
@@ -105,99 +142,24 @@ public class VillageManager : SingletonBehaviour<VillageManager>
 		}
 
 		villagers.Add(vil);
-
+	
 		return vil;
 	}
 
 	int updateTimes = 1;
 	int maxVillagers = 0;
 
-
-	void Update()
+	public void UpdateVillage(float timeInDays)
 	{
-		if (logged)
+		float timeInYears = timeInDays / 365;
+		years += (timeInYears);
+		UpdateVillagers(timeInYears);
+		if (villagers.Count > maxVillagers)
 		{
-			return;
+			maxVillagers = villagers.Count;
 		}
 
-		if (Input.GetKeyUp(KeyCode.Alpha1))
-		{
-			updateTimes = 1;
-		}
-		else if (Input.GetKeyUp(KeyCode.Alpha2))
-		{
-			updateTimes = 2;
-		}
-		else if (Input.GetKeyUp(KeyCode.Alpha3))
-		{
-			updateTimes = 4;
-		}
-		else if (Input.GetKeyUp(KeyCode.Alpha4))
-		{
-			updateTimes = 8;
-		}
-		else if (Input.GetKeyUp(KeyCode.Alpha5))
-		{
-			updateTimes = 16;
-		}
-		else if (Input.GetKeyUp(KeyCode.Alpha6))
-		{
-			updateTimes = 32;
-		}
-		else if (Input.GetKeyUp(KeyCode.Alpha7))
-		{
-			updateTimes = 64;
-		}
-		else if (Input.GetKeyUp(KeyCode.Alpha8))
-		{
-			updateTimes = 100;
-		}
-
-
-		//Starts Lagging After ~500 Villagers
-		if (villagers.Count > 500)
-		{
-			if (!logged)
-			{
-				Debug.Log("Village Reached " + villagers.Count + " Villagers After: " + years.ToString() + " years");
-				Debug.Log("Max Villagers = " + maxVillagers.ToString());
-				logged = true;
-			}
-		}
-		else if (villagers.Count > 0)
-		{
-			updateTimes = (updateTimes);
-
-			for (int i = 0; i < (updateTimes * timeMultiplier); i++)
-			{
-				if (villagers.Count > 500)
-				{
-					break;
-				}
-
-				years += (Time.deltaTime);
-				UpdateVillagers(Time.deltaTime);
-
-			}
-
-			if (villagers.Count > maxVillagers)
-			{
-				maxVillagers = villagers.Count;
-			}
-		}
-		else
-		{
-			if (!logged)
-			{
-				Debug.Log("Village Died After: " + years.ToString() + " years");
-				Debug.Log("Max Villagers = " + maxVillagers.ToString());
-				logged = true;
-			}
-		}
 	}
-
-	bool logged = false;
-
 
 	private List<Villager> killList = new List<Villager>();
 
@@ -216,7 +178,7 @@ public class VillageManager : SingletonBehaviour<VillageManager>
 
 		for (int i = 0; i < villagers.Count; i++)
 		{
-			villagers [i].Update(villageTime);
+			villagers [i].UpdateVillager(villageTime);
 		}
 
 		for (int i = 0; i < mVillagers.Count; i++)
@@ -236,7 +198,7 @@ public class VillageManager : SingletonBehaviour<VillageManager>
 	//Males Pick Female Partners *Tradition Gender Roles eekkkk* TODO
 	void BreedVillager(VillagerM vil)
 	{
-		if (vil.stats.age >= VillageManager.Instance.adultAge)
+		if (vil.stats.age >= adultAge)
 		{
 			if (vil.partners.Count < vil.stats.possiblePartnerCount)
 			{
@@ -275,7 +237,7 @@ public class VillageManager : SingletonBehaviour<VillageManager>
 			{
 				if (fVillagers [i].timeSincePregnant >= fVillagers [i].timePregnancyLasts)
 				{
-					Villager v = VillageManager.Instance.GenerateVillager(fVillagers [i].partnersM [0], fVillagers [i]);
+					Villager v = GenerateVillager(fVillagers [i].partnersM [0], fVillagers [i]);
 					fVillagers [i].AddChild(v);
 					fVillagers [i].partnersM [0].AddChild(v);
 				}

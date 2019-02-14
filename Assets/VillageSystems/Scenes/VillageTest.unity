@@ -98,7 +98,7 @@ GameObject:
   serializedVersion: 4
   m_Component:
   - 4: {fileID: 6663692}
-  - 114: {fileID: 6663691}
+  - 114: {fileID: 6663693}
   m_Layer: 0
   m_Name: GameManager
   m_TagString: Untagged
@@ -106,26 +106,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &6663691
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 6663690}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ead0c04c4c7b84dc889eefd58867d2a9, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  sizeOfVillage: {x: 100, y: 100}
-  sectionSize: {x: 100, y: 100}
-  timeMultiplier: 1
-  villagerGrowthAccelerator: 4
-  years: 0
-  initialVillagerCount: 20
-  adultAge: 16
-  maxAgeGap: 20
-  villagers: []
 --- !u!4 &6663692
 Transform:
   m_ObjectHideFlags: 0
@@ -139,6 +119,27 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 1
+--- !u!114 &6663693
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 6663690}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f154c1a1cc82643b1b4ea16595844f6b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  allVillagesExpand: 1
+  randomlySpawnVillages: 1
+  villagesInteract: 1
+  startVillageGrid: {x: -500, y: 1, z: -500}
+  endVillageGrid: {x: 500, y: 1, z: 500}
+  villages: []
+  timeMultiplier: 1
+  years: 0
+  updateValueDays: 30
+  numberOfVillagesToSpawnRandomly: 10
 --- !u!1 &1933137982
 GameObject:
   m_ObjectHideFlags: 0

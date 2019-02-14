@@ -5,13 +5,18 @@ using System.Collections.Generic;
 [System.Serializable]
 public class VillagerF : Villager
 {
+	public enum GoalsF
+	{
+		//Female Exclusive Goals
+	}
+
 	public bool pregnant = false;
 	public float timeSincePregnant;
 	public float timePregnancyLasts = 0.75f;
 
 	public List<VillagerM> partnersM;
 
-	public List<string> names = new List<string>
+	public List<string> namesF = new List<string>
 	{
 		{ "Abby" },
 		{ "Ali" },
@@ -26,7 +31,7 @@ public class VillagerF : Villager
 		gender = Gender.Female;
 		base.Initialise();
 		partnersM = new List<VillagerM>();
-		name = names [Random.Range(0, names.Count)];
+		villagerName = namesF [Random.Range(0, namesF.Count)];
 		stats.possiblePartnerCount = 1;
 	}
 
@@ -35,13 +40,13 @@ public class VillagerF : Villager
 		gender = Gender.Female;
 		base.Initialise(_dad, _mum);
 		partnersM = new List<VillagerM>();
-		name = names [Random.Range(0, names.Count)];
+		villagerName = namesF [Random.Range(0, namesF.Count)];
 		stats.possiblePartnerCount = 1;
 	}
 
-	public override void Update(float villageTime)
+	public override void UpdateVillager(float villageTime)
 	{
-		base.Update(villageTime);
+		base.UpdateVillager(villageTime);
 		if (pregnant)
 		{
 			timeSincePregnant += Time.deltaTime;
@@ -94,7 +99,7 @@ public class VillagerF : Villager
 		}
 
 		//Age Check (20 years difference is maximum)
-		if (Mathf.Abs(vil.stats.age - stats.age) > VillageManager.Instance.maxAgeGap)
+		if (Mathf.Abs(vil.stats.age - stats.age) > currentVillage.maxAgeGap)
 		{
 			return false;
 		}

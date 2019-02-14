@@ -3,23 +3,65 @@ using System.Collections;
 using System.Collections.Generic;
 
 [System.Serializable]
-public class Villager
+public class Villager : MonoBehaviour
 {
+
+	//public string serialKey { get; private set; }
+	//Serial Key should be generated via: (Something like this)
+	// Village Number (0000-9999)
+	// Villager Aspirations (00-99)
+	// Villager Name
+	// Villager Number
+	//Village Number - 24, Aspirations - Guard, Name - Villager, Village Gen - 14536
+	//E.G. 002405Villager14536
+	//
+
+
+
 	public enum Gender
 	{
 		Male,
 		Female
 	}
 
+	//Non-gendered Goals
+	public enum Goals
+	{
+		//Lead either as a village head or guard leader, etc.
+		Lead,
+		//Create a family.
+		Family,
+		//Try to become any job/class/etc.
+		Job,
+		//Tries to earn this title
+		Title
+	}
+
 	public List<string> names = new List<string> { "Villager" };
 
-	public string name = "Villager";
+	public string villagerName = "Villager";
 
 	public Section sectionAssigned { get; set; }
 
 	public Stats stats;
 
 	public bool setup = false;
+
+	public VillageManager homeVillage;
+	public VillageManager currentVillage;
+
+	/// <summary>
+	/// X Scale: -1 = Chaotic  --  0 = Neutral  --  1 = Lawful \n
+	/// Y Scale: -1 = Evil     --  0 = Neutral  --  1 = Good \n
+	/// Determines the Actions of Villagers to Situations
+	/// Neutral Neutral means that their relationship with the person will affect descisions.
+	/// </summary>
+	public Vector2 personality = Vector2.zero;
+
+	public virtual void Start()
+	{
+		gameObject.name = villagerName;
+	}
 
 
 	//Villager Family
@@ -32,6 +74,9 @@ public class Villager
 
 	public List<Villager> children { get; set; }
 
+	//String is the Person's Serial Key, Float is the Affinity Towards them.
+	public Dictionary<string, float> knownPeople { get; set; }
+
 	public Villager dad { get; set; }
 
 	public Villager mum { get; set; }
@@ -40,7 +85,7 @@ public class Villager
 
 	public virtual void Initialise(Villager _dad, Villager _mum)
 	{
-		name = names [Random.Range(0, names.Count)];
+		villagerName = names [Random.Range(0, names.Count)];
 
 		dad = _dad;
 		mum = _mum;
@@ -158,7 +203,7 @@ public class Villager
 		}
 
 		//Age Check (20 years difference is maximum)
-		if (Mathf.Abs(vil.stats.age - stats.age) > VillageManager.Instance.maxAgeGap)
+		if (Mathf.Abs(vil.stats.age - stats.age) > currentVillage.maxAgeGap)
 		{
 			return false;
 		}
@@ -192,7 +237,7 @@ public class Villager
 
 	public virtual void Initialise()
 	{
-		name = names [Random.Range(0, names.Count)];
+		villagerName = names [Random.Range(0, names.Count)];
 
 		family = new List<Villager>();
 		partners = new List<Villager>();
@@ -205,7 +250,7 @@ public class Villager
 	}
 
 
-	public virtual void Update(float villageTime)
+	public virtual void UpdateVillager(float villageTime)
 	{
 		if (!setup)
 		{
@@ -216,9 +261,9 @@ public class Villager
 
 		if (stats.age > stats.lifeTime)
 		{
-			if (VillageManager.Instance != null)
+			if (currentVillage != null)
 			{
-				VillageManager.Instance.AddToKillList(this);
+				currentVillage.AddToKillList(this);
 			}
 			else
 			{
@@ -275,9 +320,9 @@ public class Villager
 		}
 
 		//Remove themselves from the Villagers List
-		if (VillageManager.Instance != null)
+		if (currentVillage != null)
 		{
-			VillageManager.Instance.villagers.Remove(this);
+			currentVillage.villagers.Remove(this);
 		}
 	}
 
